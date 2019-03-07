@@ -1,11 +1,19 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
 )
+
+// Response sample response corresponding to person and hobbies
+// note that this has to have public fields (uppercase) for json marshaling to work properly
+type Response struct {
+	Name    string   `json:"name"`
+	Hobbies []string `json:"hobbies"`
+}
 
 func main() {
 	fmt.Println("Serving...")
@@ -15,10 +23,12 @@ func main() {
 
 	// routes; we defined the handling functions later down
 	r.HandleFunc("/", home).Methods("GET")
-	r.HandleFunc("/{id}", getID).Methods("GET")
+	r.HandleFunc("/user/{id}", getID).Methods("GET")
+	r.HandleFunc("/givemeJSON", getJSON).Methods("GET")
 
 	// run server
 	// note that we pass in the router as one of the args to ListenAndServe
+	// if nil, then it uses the default net/http router (e.g. http.HandleFunc etc)
 	if err := http.ListenAndServe(":8080", r); err != nil {
 		panic(err)
 	}
@@ -39,4 +49,18 @@ func getID(w http.ResponseWriter, r *http.Request) {
 		return // have to return otherwise the line below will run too even on error
 	}
 	fmt.Fprintf(w, "You have requested for id %s", vars["id"])
+}
+
+func getJSON(w http.ResponseWriter, r *http.Request) {
+
+	p := Response{"John", []string{"snowboarding", "skiing", "sledding"}}
+	js, err := json.Marshal(p)
+	if err != nil {
+		// another way of writing an error
+		http.Error(w, "something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(js)
 }
