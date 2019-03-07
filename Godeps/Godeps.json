@@ -1,0 +1,12 @@
+{
+	"ImportPath": "gorilla-hello",
+	"GoVersion": "go1.11",
+	"GodepVersion": "v80",
+	"Deps": [
+		{
+			"ImportPath": "github.com/gorilla/mux",
+			"Comment": "v1.7.0-3-g15a353a",
+			"Rev": "15a353a636720571d19e37b34a14499c3afa9991"
+		}
+	]
+}
